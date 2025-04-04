@@ -3,16 +3,16 @@ const { VM } = require('vm2');
 const sqlite3 = require('sqlite3').verbose();
 
 exports.handler = async (event, context) => {
-    const { Database } = require('../database'); // Adjust path if needed
+    const { Database } = require('../database');
     const db = new Database();
 
-    const { httpMethod, body, queryStringParameters } = event;
+    const { httpMethod, body, queryStringParameters, path } = event;
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
     const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
     try {
-        if (httpMethod === 'POST' && event.path === '/chat') {
+        if (httpMethod === 'POST' && path === '/chat') {
             const { message, userId = 'guest' } = JSON.parse(body);
             const lowerMessage = message.toLowerCase();
             let response = "Hi! I'm AI.zak, here to help with JavaScript or anything else! What’s on your mind?";
@@ -34,8 +34,6 @@ exports.handler = async (event, context) => {
             } else if (lowerMessage === "new chat") {
                 await db.clearHistory(userId);
                 response = "New chat started! How can AI.zak assist you now?";
-            } else if (explanations[lowerMessage]) {
-                response = explanations[lowerMessage];
             } else {
                 const aiResponse = await axios.post(
                     GEMINI_API_URL,
@@ -55,11 +53,11 @@ exports.handler = async (event, context) => {
                     quickReplies: ["Variables", "Functions", "Loops", "Arrays", "Objects", "Weather", "Joke", "Playground", "Samples", "Iteration", "Code Blocks"]
                 })
             };
-        } else if (httpMethod === 'GET' && event.path === '/history') {
+        } else if (httpMethod === 'GET' && path === '/history') {
             const userId = queryStringParameters.userId || 'guest';
             const history = await db.getHistory(userId);
             return { statusCode: 200, body: JSON.stringify(history) };
-        } else if (httpMethod === 'POST' && event.path === '/clear') {
+        } else if (httpMethod === 'POST' && path === '/clear') {
             const { userId } = JSON.parse(body);
             await db.clearHistory(userId);
             return { statusCode: 200, body: JSON.stringify({ success: true }) };
@@ -68,17 +66,16 @@ exports.handler = async (event, context) => {
         return { statusCode: 404, body: JSON.stringify({ error: 'Not Found' }) };
     } catch (error) {
         console.error('Error:', error);
-        return { statusCode: 500, body: JSON.stringify({ response: "Sorry, something went wrong!", quickReplies: [] }) };
+        return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
     } finally {
         db.close();
     }
 };
 
-// Helper functions (move these out if reusable across functions)
 async function fetchWeatherData(city) {
     try {
         const response = await axios.get(
-            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=metric`
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`
         );
         return {
             temperature: response.data.main.temp,
@@ -102,9 +99,3 @@ function runPlayground(code) {
         return `Error: ${error.message}`;
     }
 }
-
-const explanations = {
-    "iteration": "Iteration in JavaScript means repeating a block of code multiple times. For example, a <code>for</code> loop iterates over numbers: <pre>for (let i = 0; i < 3; i++) {\n    console.log(i);\n}</pre> This runs 3 times, printing 0, 1, 2.",
-    "variables": "Variables in JavaScript store data you can use later. Use <code>let</code>, <code>const</code>, or <code>var</code>: <pre>let age = 25;\nconsole.log(age);</pre> <code>let</code> can change, <code>const</code> can’t."
-    // Add other explanations as needed
-};
