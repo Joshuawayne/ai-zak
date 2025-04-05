@@ -1,3 +1,4 @@
+require('dotenv').config(); // Optional for local testing, not needed on Netlify
 const axios = require('axios');
 const { VM } = require('vm2');
 const sqlite3 = require('sqlite3').verbose();
@@ -7,9 +8,9 @@ exports.handler = async (event, context) => {
     const db = new Database();
 
     const { httpMethod, body, queryStringParameters, path } = event;
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // From Netlify env vars
     const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
-    const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+    const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY; // From Netlify env vars
 
     try {
         if (httpMethod === 'POST' && path === '/chat') {
