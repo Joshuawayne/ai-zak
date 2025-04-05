@@ -1,17 +1,17 @@
-// server.js
+require('dotenv').config(); // Load environment variables from .env
 const express = require('express');
 const axios = require('axios');
 const { VM } = require('vm2');
 const { Database } = require('./database');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use PORT from .env or default to 3000
 
 app.use(express.json());
 app.use(express.static('public'));
 
-const GEMINI_API_KEY = 'b445ab08488a88ad53b6fb36482cdbd7';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // From .env
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
-const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY';
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY; // From .env
 
 // Database setup
 const db = new Database();
@@ -126,7 +126,7 @@ app.post('/chat', async (req, res) => {
                 },
                 {
                     headers: {
-                        'Content-Type': "application/json",
+                        'Content-Type': 'application/json',
                         'x-goog-api-key': GEMINI_API_KEY
                     }
                 }
