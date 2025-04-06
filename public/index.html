@@ -6,8 +6,216 @@
     <title>AI.zak - JavaScript Chatbot</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet" />
-    <!-- Styles remain unchanged -->
+
+    <style>
+        
+        body { 
+            font-family: 'Orbitron', sans-serif; 
+            margin: 0; 
+            background: url('https://www.transparenttextures.com/patterns/circuit.png'), #1a1a2e; 
+            background-blend-mode: overlay; 
+            color: #e0e0e0; 
+        }
+        #login-container { 
+            max-width: 400px; 
+            margin: 150px auto; 
+            padding: 30px; 
+            background: rgba(0, 0, 0, 0.8); 
+            border-radius: 15px; 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); 
+            text-align: center; 
+            border: 2px solid #00ffff; 
+        }
+        #login-container h2 { 
+            font-size: 2em; 
+            color: #00ffff; 
+            text-shadow: 0 0 10px #00ffff; 
+            margin-bottom: 20px; 
+        }
+        #username-input { 
+            width: 80%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #00ffff; 
+            border-radius: 5px; 
+            background: #0f0f23; 
+            color: #e0e0e0; 
+            font-family: 'Orbitron', sans-serif; 
+        }
+        #login-button, #continue-button { 
+            padding: 12px 30px; 
+            background-color: #00ffff; 
+            color: #0f0f23; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            transition: all 0.3s; 
+            margin: 5px; 
+        }
+        #login-button:hover, #continue-button:hover { 
+            background-color: #00cccc; 
+            box-shadow: 0 0 15px #00ffff; 
+        }
+        #preloader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: #0f0f23; 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        #preloader-text { 
+            font-size: 3em; 
+            color: #00ffff; 
+            text-shadow: 0 0 10px #00ffff; 
+            letter-spacing: 5px; 
+        }
+        #chat-container { 
+            max-width: 700px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: rgba(0, 0, 0, 0.7); 
+            border-radius: 15px; 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); 
+            border: 1px solid #00ffff; 
+            display: none; 
+        }
+        #chat-controls { 
+            margin-bottom: 15px; 
+            text-align: right; 
+        }
+        #new-chat-button { 
+            padding: 8px 20px; 
+            background-color: #00ffff; 
+            color: #0f0f23; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            transition: all 0.3s; 
+        }
+        #new-chat-button:hover { 
+            background-color: #00cccc; 
+            box-shadow: 0 0 10px #00ffff; 
+        }
+        #chat-box { 
+            height: 400px; 
+            overflow-y: scroll; 
+            border: 1px solid #00ffff; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            background: #0f0f23; 
+            border-radius: 5px; 
+        }
+        .message { 
+            margin-bottom: 10px; 
+            padding: 10px; 
+            border-radius: 5px; 
+        }
+        .user-message { 
+            background-color: #00cccc; 
+            text-align: right; 
+            color: #0f0f23; 
+        }
+        .bot-message { 
+            background-color: #333355; 
+            text-align: left; 
+            color: #e0e0e0; 
+        }
+        #user-input-container { 
+            display: flex; 
+            align-items: center; 
+        }
+        #user-input { 
+            flex: 1; 
+            padding: 10px; 
+            border: 1px solid #00ffff; 
+            border-radius: 5px 0 0 5px; 
+            outline: none; 
+            background: #0f0f23; 
+            color: #e0e0e0; 
+        }
+        #send-button { 
+            padding: 10px; 
+            border: none; 
+            background-color: #00ffff; 
+            color: #0f0f23; 
+            border-radius: 0 5px 5px 0; 
+            cursor: pointer; 
+        }
+        #send-button:hover { 
+            background-color: #00cccc; 
+        }
+        #quick-replies { 
+            margin-top: 10px; 
+        }
+        #quick-replies button { 
+            margin: 5px; 
+            padding: 5px 10px; 
+            border: 1px solid #00ffff; 
+            border-radius: 5px; 
+            background-color: #0f0f23; 
+            color: #00ffff; 
+            cursor: pointer; 
+        }
+        #quick-replies button:hover { 
+            background-color: #333355; 
+        }
+        code { 
+            background: #333355; 
+            padding: 2px 5px; 
+            border-radius: 3px; 
+            color: #00ffff; 
+        }
+        pre { 
+            background: #1a1a2e; 
+            color: #f8f8f2; 
+            padding: 10px; 
+            border-radius: 5px; 
+            white-space: pre-wrap; 
+            font-family: 'Courier New', monospace; 
+        }
+        #playground-container { 
+            display: none; 
+            margin-top: 10px; 
+        }
+        #playground-input { 
+            width: 100%; 
+            height: 100px; 
+            padding: 10px; 
+            border: 1px solid #00ffff; 
+            border-radius: 5px; 
+            background: #0f0f23; 
+            color: #e0e0e0; 
+            font-family: 'Courier New', monospace; 
+        }
+        #run-button { 
+            padding: 10px; 
+            margin-top: 5px; 
+            background-color: #28a745; 
+            color: #fff; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        #run-button:hover { 
+            background-color: #218838; 
+        }
+        .typing { 
+            animation: blink 0.5s step-end infinite; 
+        }
+        @keyframes blink { 
+            50% { opacity: 0; } 
+        }
+  
+    </style>
 </head>
+    
 <body>
     <div id="login-container">
         <h2>Welcome to AI.zak</h2>
